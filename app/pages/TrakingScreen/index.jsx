@@ -11,6 +11,7 @@ import {
   StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import FAIcon from 'react-native-vector-icons/FontAwesome6';
 
 export default function TrackingInputScreen() {
   const navigation = useNavigation();
@@ -28,7 +29,9 @@ export default function TrackingInputScreen() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
       <View style={styles.header}>
-        <Icon name="box" size={24} color="#10B981" />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <FAIcon name="arrow-left" size={24} color="#10B981" />
+        </TouchableOpacity>
         <Text style={styles.headerText}>GetMyRx Tracker</Text>
         <TouchableOpacity accessibilityLabel="Menu">
           {/* <Icon name="menu" size={24} color="#000" /> */}

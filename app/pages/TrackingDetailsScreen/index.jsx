@@ -120,7 +120,17 @@ export default function TrackingDetailsScreen({navigation, route}) {
       <SafeAreaView style={{flex: 1}}>
         <ScrollView style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Track Order</Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                // justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <FAIcon name="arrow-left" size={24} color="#10B981" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Track Order</Text>
+            </View>
             <Text style={styles.headerDate}>
               {data && data.length > 0 && formatDate(data[0].created)}
             </Text>
@@ -275,6 +285,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#1F2937',
+    marginLeft: 10,
   },
   headerDate: {
     fontSize: 14,
