@@ -37,6 +37,7 @@ export default function LoginScreen() {
         setIsLoading(false);
       }
     }
+    // navigation.navigate('otpverification', {phoneNumber});
   };
 
   return (

@@ -13,8 +13,9 @@ import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import OrderCard from './OrderCard';
 import {getDeliveriesRequest} from '../../api/apiCalls';
-import {getStore} from '../../stores/asyncStore';
+import {getStore, removeStore} from '../../stores/asyncStore';
 import storeKeys from '../../stores/storeKeys';
+import Loading from '../../components/Loading';
 
 type Order = {
   id: string;
@@ -98,19 +99,26 @@ const mockOrders: Order[] = [
 ];
 
 const TabBar: React.FC<{
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
+  activeTab: number;
+  setActiveTab: (tab: any) => void;
 }> = ({activeTab, setActiveTab}) => {
   return (
     <View style={styles.tabBar}>
-      {['Completed', 'Ongoing', 'Unable'].map(tab => (
+      {[
+        {id: 2, name: 'Completed'},
+        {id: 0, name: 'Ongoing'},
+        {id: 5, name: 'Unable'},
+      ].map(tab => (
         <TouchableOpacity
-          key={tab}
-          style={[styles.tab, activeTab === tab && styles.activeTab]}
+          key={tab.id}
+          style={[styles.tab, activeTab === tab.id && styles.activeTab]}
           onPress={() => setActiveTab(tab)}>
           <Text
-            style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-            {tab}
+            style={[
+              styles.tabText,
+              activeTab === tab.id && styles.activeTabText,
+            ]}>
+            {tab.name}
           </Text>
         </TouchableOpacity>
       ))}
@@ -120,46 +128,88 @@ const TabBar: React.FC<{
 
 export default function OrderHistory() {
   const navigation = useNavigation();
-  const [activeTab, setActiveTab] = useState('Ongoing');
-
-  const filteredOrders = mockOrders.filter(order => order.status === activeTab);
+  const [activeTab, setActiveTab] = useState<any>({id: 0, name: 'Ongoing'});
+  const [data, setData] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState<any>([]);
+  const [isLoading, setIsLoading] = useState<Boolean>(false);
+  // const filteredOrders = mockOrders.filter(order => order.status === activeTab);
   useEffect(() => {
     (async () => {
       await getData();
     })();
   }, []);
 
+  useEffect(() => {
+    if (data.length > 0) {
+      console.log(data.filter((order: any) => order.status === activeTab.id));
+      setFilteredOrders(
+        data.filter((order: any) => order.status === activeTab.id),
+      );
+    }
+  }, [data, activeTab]);
+
   async function getData() {
     try {
+      setIsLoading(true);
       const uesrId = await getStore(storeKeys.userId);
 
-      const res = await getDeliveriesRequest(uesrId);
-      console.log('getDeliveriesRequest', res);
+      const res: any = await getDeliveriesRequest(uesrId);
+      if (res.status === 200) {
+        setData(res.data.data);
+        setIsLoading(false);
+      }
+      console.log('getDeliveriesRequest', res.data);
     } catch (error) {
       console.log('Error');
+      setIsLoading(false);
     }
   }
+
+  const handleLogOut = async () => {
+    await removeStore(storeKeys.token);
+    await removeStore(storeKeys.userId);
+    navigation.navigate('login' as never);
+  };
   return (
     <>
       <SafeAreaView style={{flex: 0, backgroundColor: '#D49D84'}} />
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>Orders</Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('traking' as never)}>
-            <Icon name="search" size={24} color="#fff" />
-          </TouchableOpacity>
+          <View style={styles.headerIcons}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('customerOrders' as never)}>
+              <Icon name="list" size={24} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('newOrder' as never)}>
+              <Icon name="plus" size={24} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('traking' as never)}>
+              <Icon name="search" size={24} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleLogOut}>
+              <Icon name="log-out" size={24} color="#fff" />
+            </TouchableOpacity>
+          </View>
         </View>
-        <TabBar activeTab={activeTab} setActiveTab={setActiveTab} />
-        <FlatList
-          data={filteredOrders}
-          renderItem={({item}) => <OrderCard order={item} />}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.orderList}
-          refreshControl={
-            <RefreshControl refreshing={false} onRefresh={getData} />
-          }
-        />
+        <TabBar activeTab={activeTab.id} setActiveTab={setActiveTab} />
+        {isLoading ? (
+          <View style={{flex: 1}}>
+            <Loading />
+          </View>
+        ) : (
+          <FlatList
+            data={filteredOrders}
+            renderItem={({item}) => <OrderCard order={item} />}
+            keyExtractor={item => item.id}
+            contentContainerStyle={styles.orderList}
+            refreshControl={
+              <RefreshControl refreshing={false} onRefresh={getData} />
+            }
+          />
+        )}
       </SafeAreaView>
     </>
   );
@@ -208,5 +258,9 @@ const styles = StyleSheet.create({
   orderList: {
     padding: 20,
     gap: 10,
+  },
+  headerIcons: {
+    flexDirection: 'row',
+    gap: 20,
   },
 });

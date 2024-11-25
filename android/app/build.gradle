@@ -79,15 +79,21 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.trackingapp"
+    namespace "com.CargoOptix"
     defaultConfig {
-        applicationId "com.trackingapp"
+        applicationId "com.CargoOptix"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
     }
     signingConfigs {
+        release {
+            storeFile file('cargo_optix.keystore')
+            storePassword '123456'
+            keyAlias 'cargo_optix'
+            keyPassword '123456'
+        }
         debug {
             storeFile file('debug.keystore')
             storePassword 'android'

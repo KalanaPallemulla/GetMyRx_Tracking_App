@@ -56,9 +56,18 @@ function formatTime(dateStr) {
 
   return time;
 }
-const StatusItem = ({icon, title, description, time, isActive, onPress}) => {
+const StatusItem = ({
+  icon,
+  title,
+  description,
+  time,
+  isActive,
+  photoUrl = '',
+  signatureUrl = '',
+  onPress,
+}) => {
   return (
-    <TouchableOpacity style={styles.statusItem} onPress={onPress}>
+    <TouchableOpacity style={styles.statusItem}>
       <View style={{alignItems: 'center', justifyContent: 'center'}}>
         <View style={[styles.statusIcon, isActive && styles.activeStatusIcon]}>
           <Icon
@@ -70,7 +79,27 @@ const StatusItem = ({icon, title, description, time, isActive, onPress}) => {
       </View>
       <View style={styles.statusContent}>
         <Text style={styles.statusTitle}>{title}</Text>
-        <Text style={styles.statusDescription}>{description}</Text>
+        <View style={{flexDirection: 'row'}}>
+          <Text style={styles.statusDescription}>{description}</Text>
+          <View style={{flexDirection: 'row', marginLeft: 20, gap: 20}}>
+            {photoUrl && (
+              <Icon
+                onPress={() => onPress(photoUrl)}
+                name={icon}
+                size={16}
+                color={isActive ? '#10B981' : '#9CA3AF'}
+              />
+            )}
+            {signatureUrl && (
+              <Icon
+                onPress={() => onPress(signatureUrl)}
+                name={icon}
+                size={16}
+                color={isActive ? '#10B981' : '#9CA3AF'}
+              />
+            )}
+          </View>
+        </View>
       </View>
       <Text style={styles.statusTime}>{time}</Text>
     </TouchableOpacity>
@@ -92,12 +121,16 @@ export default function TrackingDetailsScreen({navigation, route}) {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `https://devapi.getmyrx.ca/v2/delivery/track/${
-            route.params ? route.params : '009675'
+          `https://uatapi.getmyrx.ca/v2/delivery/track/${
+            route.params ? route.params.id : '009675'
           }`,
         );
         console.log(response.data.data);
         if (response.status === 200) {
+          console.log(
+            'https://devapi.getmyrx.ca/v2/delivery/track/',
+            response.data.data,
+          );
           setData(response.data.data);
         }
         setIsLoading(false);
@@ -127,7 +160,7 @@ export default function TrackingDetailsScreen({navigation, route}) {
                 alignItems: 'center',
               }}>
               <TouchableOpacity onPress={() => navigation.goBack()}>
-                <FAIcon name="arrow-left" size={24} color="#10B981" />
+                <FAIcon name="arrow-left" size={24} color="#D49D84" />
               </TouchableOpacity>
               <Text style={styles.headerTitle}>Track Order</Text>
             </View>
@@ -138,7 +171,7 @@ export default function TrackingDetailsScreen({navigation, route}) {
               <Text style={styles.orderId}>
                 Order ID: {data && data.length > 0 && data[0].ddelivery_id}
               </Text>
-              <FAIcon name={'truck-medical'} size={16} color="#10B981" />
+              <FAIcon name={'truck-medical'} size={16} color="#D49D84" />
 
               {/* <Text style={styles.orderAmount}>Amt: $345.00</Text> */}
             </View>
@@ -176,17 +209,19 @@ export default function TrackingDetailsScreen({navigation, route}) {
                       : 'check-circle'
                   }
                   title={item.delivery_status_description}
+                  photoUrl={item?.photo_url}
+                  signatureUrl={item?.signature_url}
                   description={formatDate(item.created)}
                   time={formatTime(item.created)}
                   isActive={true}
-                  onPress={() => handleStatusPress(item.signature_url)}
+                  onPress={handleStatusPress}
                 />
                 {index !== data.length - 1 && (
                   <View style={[styles.threeDotsIcon]}>
                     <FAIcon
                       name={'ellipsis-vertical'}
                       size={20}
-                      color="#9CA3AF"
+                      color="#D49D84"
                     />
                   </View>
                 )}
@@ -226,21 +261,6 @@ export default function TrackingDetailsScreen({navigation, route}) {
               </Text>
             </View>
           </View>
-
-          <TouchableOpacity style={styles.ratingContainer}>
-            <Icon
-              name="star"
-              size={20}
-              color="#FCD34D"
-              style={styles.ratingIcon}
-            />
-            <View>
-              <Text style={styles.ratingTitle}>Don't forget to rate</Text>
-              <Text style={styles.ratingText}>
-                Oh Tasty Kitchen to help your fellow foodies
-              </Text>
-            </View>
-          </TouchableOpacity>
         </ScrollView>
         <Modal
           animationType="fade"

@@ -55,6 +55,7 @@ const OTPVerificationScreen = ({route}) => {
     } catch (error) {
       console.log(error);
     }
+    // navigation.navigate('orderList');
   };
 
   return (
@@ -62,7 +63,8 @@ const OTPVerificationScreen = ({route}) => {
       <View style={styles.contentContainer}>
         <Text style={styles.title}>Verification Code</Text>
         <Text style={styles.subtitle}>
-          We have sent the verification code to your phone number
+          We have sent the verification code to your phone number (
+          {route.params.phoneNumber})
         </Text>
         <View style={styles.otpContainer}>
           {otp.map((digit, index) => (

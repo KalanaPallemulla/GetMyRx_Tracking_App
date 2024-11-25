@@ -2,24 +2,25 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import {useNavigation} from '@react-navigation/native';
 type Order = {
-  id: string;
-  pharmacyName: string;
-  deliveryAddress: string;
+  ddelivery_id: string;
+  pharmacy_name: string;
+  address: string;
   deliveryDate: string;
   deliveryBoy: string;
-  amountToBeCollected: number;
-  noOfPackages: number;
-  createdTime: string;
-  status: 'Ongoing' | 'Completed' | 'Unable';
+  amount_to_be_collected: number;
+  no_of_packages: number;
+  created: string;
+  status: 0 | 2 | 5;
+  deliver_on: string;
 };
 
-const getStatusColor = (status: string) => {
+const getStatusColor = (status: number) => {
   switch (status) {
-    case 'Ongoing':
+    case 0:
       return '#10B981';
-    case 'Completed':
+    case 2:
       return '#3B82F6';
-    case 'Unable':
+    case 5:
       return '#EF4444';
     default:
       return '#6B7280';
@@ -31,25 +32,21 @@ const OrderCard: React.FC<{order: Order}> = ({order}) => {
 
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate('trakingDetails' as never)}
+      onPress={() =>
+        navigation.navigate('trakingDetails', {id: order.ddelivery_id})
+      }
       style={styles.container}>
       <View style={styles.secondSection}>
-        <Text style={[styles.status, {color: getStatusColor(order.status)}]}>
-          {order.status === 'Unable' ? 'Unable to deliver' : order.status}
+        <Text style={{fontWeight: '600', color: 'gray', fontSize: 14}}>
+          Order Id: 025273
         </Text>
-        <View
-          style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'row',
-          }}>
-          <Image
-            source={require('../../assets/package.png')}
-            style={styles.image}
-            resizeMode="contain"
-          />
-          <Text style={{marginLeft: 4}}>{order.noOfPackages}</Text>
-        </View>
+        <Text style={[styles.status, {color: getStatusColor(order.status)}]}>
+          {order.status === 5
+            ? 'Unable to deliver'
+            : order.status === 0
+            ? 'Ongoing'
+            : 'Completed'}
+        </Text>
       </View>
       <View style={styles.line} />
 
@@ -62,9 +59,9 @@ const OrderCard: React.FC<{order: Order}> = ({order}) => {
           />
         </View>
         <View style={styles.sectionOneDetails}>
-          <Text style={styles.pharmacyText}>{order.pharmacyName}</Text>
+          <Text style={styles.pharmacyText}>{order.pharmacy_name}</Text>
           <Text style={styles.createdTimeText}>
-            Created time: {order.createdTime}
+            Created time: {order.created}
           </Text>
         </View>
       </View>
@@ -79,16 +76,30 @@ const OrderCard: React.FC<{order: Order}> = ({order}) => {
           />
         </View>
         <View style={styles.sectionOneDetails}>
-          <Text style={styles.pharmacyText}>{order.deliveryAddress}</Text>
-          {/* <Text style={styles.createdTimeText}>
-            Created time: {order.createdTime}
-          </Text> */}
+          <Text numberOfLines={1} style={styles.pharmacyText}>
+            {order.address}
+          </Text>
+          <Text style={styles.createdTimeText}>
+            Delivery time: {order.deliver_on}
+          </Text>
         </View>
       </View>
       <View style={styles.line} />
       <View style={styles.bottomSection}>
-        <Text style={styles.viewMore}>View More</Text>
-        <Text>$ {order.amountToBeCollected}</Text>
+        <View
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'row',
+          }}>
+          <Image
+            source={require('../../assets/package.png')}
+            style={styles.image}
+            resizeMode="contain"
+          />
+          <Text style={{marginLeft: 4}}>{order.no_of_packages}</Text>
+        </View>
+        <Text>$ {order.amount_to_be_collected}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -128,6 +139,8 @@ const styles = StyleSheet.create({
   sectionOneDetails: {
     marginLeft: 16,
     // gap: 4,
+    width: '85%',
+    overflow: 'scroll',
   },
   createdTimeText: {
     fontSize: 12,

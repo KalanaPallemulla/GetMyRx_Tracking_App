@@ -487,3 +487,14 @@ export const getPharmacyCustomersRequest = async pharmacyId => {
     console.log(error);
   }
 };
+
+export const addNewOrderRequest = async data => {
+  return await doRequest(`v3/user/createCustomerOrder`, 'POST', data);
+};
+
+export const getNewOrdersRequest = async () => {
+  const userId = await getStore(storeKey.userId);
+  return await doRequest(
+    `v3/user/getCustomerOrders/${userId}?pharmacy_id=282c0ac8-d004-4d3f-aae6-a24418a989a8`,
+  );
+};

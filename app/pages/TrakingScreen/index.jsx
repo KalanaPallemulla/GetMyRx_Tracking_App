@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import FAIcon from 'react-native-vector-icons/FontAwesome6';
-
+import Logo from '../../assets/logo.png';
 export default function TrackingInputScreen() {
   const navigation = useNavigation();
 
@@ -30,9 +30,9 @@ export default function TrackingInputScreen() {
       <StatusBar barStyle="light-content" />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <FAIcon name="arrow-left" size={24} color="#10B981" />
+          <FAIcon name="arrow-left" size={24} color="#D49D84" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>GetMyRx Tracker</Text>
+        <Text style={styles.headerText}>Cargo Optix</Text>
         <TouchableOpacity accessibilityLabel="Menu">
           {/* <Icon name="menu" size={24} color="#000" /> */}
         </TouchableOpacity>
@@ -41,9 +41,7 @@ export default function TrackingInputScreen() {
         <View style={styles.cardContainer}>
           <Text style={styles.timeText}>11:46:12</Text>
           <Image
-            source={{
-              uri: `https://img.freepik.com/free-vector/gps-kids-tracker-watches-abstract-concept-illustration_335657-1813.jpg`,
-            }}
+            source={Logo}
             style={styles.cardImage}
             accessibilityLabel="Package image"
           />
@@ -91,7 +89,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#03269f',
+    color: '#D49D84',
   },
   gradientBackground: {
     height: 300,
@@ -164,7 +162,7 @@ const styles = StyleSheet.create({
   submitButton: {
     width: 50,
     height: 50,
-    backgroundColor: '#10B981',
+    backgroundColor: '#D49D84',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
