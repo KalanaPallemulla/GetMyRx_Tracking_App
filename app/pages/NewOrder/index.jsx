@@ -40,6 +40,12 @@ const generateUniqueId = () => {
 };
 const AmazingNewOrder = () => {
   const navigation = useNavigation();
+  const [userDetails, setUserDetails] = useState({
+    firstName: '',
+    lastName: '',
+    address: '',
+    phoneNumber: '',
+  });
   const [isDateModelOpen, setIsDateModelOpen] = useState(false);
   const [deliveryDate, setDeliveryDate] = useState(new Date());
   const [images, setImages] = useState([
@@ -70,6 +76,13 @@ const AmazingNewOrder = () => {
       } catch (error) {
         console.log(error);
       }
+    })();
+    (async () => {
+      setUserDetails({
+        firstName: await getStore(storeKeys.first_name),
+        lastName: await getStore(storeKeys.last_name),
+        phoneNumber: await getStore(storeKeys.phone_number),
+      });
     })();
     (() => {
       const id = `image-${Math.random().toString(36).substr(2, 9)}`;
@@ -229,7 +242,9 @@ const AmazingNewOrder = () => {
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Name</Text>
-                <Text style={styles.infoText}>John Doe</Text>
+                <Text style={styles.infoText}>
+                  {userDetails.firstName + ' ' + userDetails.lastName}
+                </Text>
               </View>
             </View>
             <View style={styles.infoRow}>
@@ -249,7 +264,7 @@ const AmazingNewOrder = () => {
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Phone</Text>
-                <Text style={styles.infoText}>+94705274897</Text>
+                <Text style={styles.infoText}>{userDetails.phoneNumber}</Text>
               </View>
             </View>
           </View>

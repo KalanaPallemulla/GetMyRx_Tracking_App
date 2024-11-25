@@ -20,6 +20,9 @@ import LinearGradient from 'react-native-linear-gradient';
 const {width, height} = Dimensions.get('window');
 
 export default function LoginScreen() {
+  LoginScreen.navigationOptions = ({navigation}) => ({
+    gesturesEnabled: navigation.getParam('myCondition', true), // second param is default value
+  });
   const navigation = useNavigation();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);

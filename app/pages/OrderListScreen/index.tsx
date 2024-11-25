@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
   RefreshControl,
+  StatusBar,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
@@ -168,10 +169,16 @@ export default function OrderHistory() {
   const handleLogOut = async () => {
     await removeStore(storeKeys.token);
     await removeStore(storeKeys.userId);
+    await removeStore(storeKeys.first_name);
+    await removeStore(storeKeys.last_name);
+    await removeStore(storeKeys.phone_number);
+
     navigation.navigate('login' as never);
   };
   return (
     <>
+      <StatusBar barStyle="light-content" backgroundColor="#D49D84" />
+
       <SafeAreaView style={{flex: 0, backgroundColor: '#D49D84'}} />
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>

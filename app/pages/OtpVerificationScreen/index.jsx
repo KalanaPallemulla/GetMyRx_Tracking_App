@@ -48,6 +48,12 @@ const OTPVerificationScreen = ({route}) => {
             console.log('res.data.access_token', res.data);
             await saveStore(storeKeys.token, tokenRes.data.access_token);
             await saveStore(storeKeys.userId, res.data.data.user_id);
+            await saveStore(storeKeys.first_name, res.data.data.first_name);
+            await saveStore(storeKeys.last_name, res.data.data.last_name);
+            await saveStore(
+              storeKeys.phone_number,
+              res.data.data.mobile_number,
+            );
             navigation.navigate('orderList');
           }
         }

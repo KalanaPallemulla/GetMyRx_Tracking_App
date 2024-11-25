@@ -8,6 +8,8 @@ const storeKeys = {
   sync_date: 'sync_date',
   username: 'username',
   password: 'password',
+  phone_number: 'phone_number',
+  address: 'address',
 };
 
 export default storeKeys;

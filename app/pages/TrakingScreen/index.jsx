@@ -27,7 +27,7 @@ export default function TrackingInputScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="light-content" backgroundColor="#D49D84" />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <FAIcon name="arrow-left" size={24} color="#D49D84" />
