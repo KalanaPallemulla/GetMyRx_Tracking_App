@@ -10,13 +10,15 @@ type Order = {
   amount_to_be_collected: number;
   no_of_packages: number;
   created: string;
-  status: 0 | 2 | 5;
+  status: 0 | 2 | 5 | 1;
   deliver_on: string;
 };
 
 const getStatusColor = (status: number) => {
   switch (status) {
     case 0:
+      return '#10B981';
+    case 1:
       return '#10B981';
     case 2:
       return '#3B82F6';
@@ -38,12 +40,14 @@ const OrderCard: React.FC<{order: Order}> = ({order}) => {
       style={styles.container}>
       <View style={styles.secondSection}>
         <Text style={{fontWeight: '600', color: 'gray', fontSize: 14}}>
-          Order Id: 025273
+          Order Id: {order.ddelivery_id}
         </Text>
         <Text style={[styles.status, {color: getStatusColor(order.status)}]}>
           {order.status === 5
             ? 'Unable to deliver'
             : order.status === 0
+            ? 'Pending'
+            : order.status === 1
             ? 'Ongoing'
             : 'Completed'}
         </Text>
@@ -111,7 +115,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#D49D84',
+    borderColor: '#ffa022',
     padding: 4,
     borderRadius: 12,
     paddingHorizontal: 12,

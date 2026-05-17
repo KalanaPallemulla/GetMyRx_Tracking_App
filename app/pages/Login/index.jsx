@@ -32,11 +32,15 @@ export default function LoginScreen() {
       setIsLoading(true);
       try {
         const res = await optSentRequest(phoneNumber);
-        if (res.status === 200)
+        if (res.status === 200) {
           navigation.navigate('otpverification', {phoneNumber});
+        } else {
+          showAlert({message: 'Please check your phone number', type: 'error'});
+        }
         setIsLoading(false);
       } catch (error) {
         showAlert({message: 'Please check your phone number', type: 'error'});
+
         setIsLoading(false);
       }
     }
@@ -49,7 +53,7 @@ export default function LoginScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}>
         {/* <LinearGradient
-          colors={['#FFB17A', '#E5A87F', '#D49D84']}
+          colors={['#FFB17A', '#E5A87F', '#ffa022']}
           style={styles.gradient}> */}
         <View style={styles.imageContainer}>
           <Image
@@ -161,7 +165,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   button: {
-    backgroundColor: '#D49D84',
+    backgroundColor: '#ffa022',
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 12,

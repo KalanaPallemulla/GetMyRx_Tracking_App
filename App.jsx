@@ -41,8 +41,8 @@ function App() {
 
   return (
     <>
+      <FlashMessage />
       <Provider store={store}>
-        <FlashMessage />
         <NavigationContainer>
           <Stack.Navigator initialRouteName={token ? 'orderList' : 'login'}>
             <Stack.Screen

@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Dimensions,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import {
   ArrowLeft,
@@ -21,8 +22,38 @@ import {
 } from 'react-native-feather';
 import {useNavigation} from '@react-navigation/native';
 import {getNewOrdersRequest} from '../../api/apiCalls';
+import Loading from '../../components/Loading';
+import {removeStore} from '../../stores/asyncStore';
+import storeKeys from '../../stores/storeKeys';
 
 const {width} = Dimensions.get('window');
+
+const ImageWithLoader = ({uri}) => {
+  const [loading, setLoading] = useState(true);
+
+  return (
+    <View style={styles.imageContainer}>
+      {loading && (
+        <View style={styles.imageContainer}>
+          <View
+            style={{
+              width: (width - 64) / 3,
+              height: (width - 64) / 3,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        </View>
+      )}
+      <Image
+        source={{uri}}
+        style={styles.image}
+        onLoadEnd={() => setLoading(false)}
+      />
+    </View>
+  );
+};
 
 const OrderItem = ({order, onPress}) => (
   <TouchableOpacity style={styles.card} onPress={onPress}>
@@ -41,29 +72,29 @@ const OrderItem = ({order, onPress}) => (
         </View>
       </View>
       <View style={styles.iconContainer}>
-        <Package stroke="#D49D84" width={24} height={24} />
+        <Package stroke="#ffa022" width={24} height={24} />
       </View>
     </View>
 
     <View style={styles.orderDetails}>
       <View style={styles.detailRow}>
-        <Calendar stroke="#D49D84" width={20} height={20} />
+        <Calendar stroke="#ffa022" width={20} height={20} />
         <Text style={styles.detailText}>Created: {order.created}</Text>
       </View>
       <View style={styles.detailRow}>
-        <Calendar stroke="#D49D84" width={20} height={20} />
+        <Calendar stroke="#ffa022" width={20} height={20} />
         <Text style={styles.detailText}>Deliver: {order.deliver_on}</Text>
       </View>
       <View style={styles.detailRow}>
-        <MapPin stroke="#D49D84" width={20} height={20} />
+        <MapPin stroke="#ffa022" width={20} height={20} />
         <Text style={styles.detailText}>{order.address}</Text>
       </View>
       <View style={styles.detailRow}>
-        <Home stroke="#D49D84" width={20} height={20} />
+        <Home stroke="#ffa022" width={20} height={20} />
         <Text style={styles.detailText}>{order.pharmacy_name}</Text>
       </View>
       <View style={styles.detailRow}>
-        <FileText stroke="#D49D84" width={20} height={20} />
+        <FileText stroke="#ffa022" width={20} height={20} />
         <Text style={styles.detailText}>
           {order.notes || 'No additional notes'}
         </Text>
@@ -77,43 +108,59 @@ const OrderItem = ({order, onPress}) => (
           <Image key={index} source={{uri: image}} style={styles.image} />
         ))} */}
         {order.prescription_url1 && (
-          <Image source={{uri: order.prescription_url1}} style={styles.image} />
+          <ImageWithLoader uri={order.prescription_url1} />
         )}
         {order.prescription_url2 && (
-          <Image source={{uri: order.prescription_url2}} style={styles.image} />
+          <ImageWithLoader uri={order.prescription_url2} />
         )}
         {order.prescription_url3 && (
-          <Image source={{uri: order.prescription_url3}} style={styles.image} />
+          <ImageWithLoader uri={order.prescription_url3} />
         )}
       </View>
     </View>
 
     <View style={styles.footer}>
       <Text style={styles.viewDetailsText}>View Full Details</Text>
-      <ChevronRight stroke="#D49D84" width={24} height={24} />
+      <ChevronRight stroke="#ffa022" width={24} height={24} />
     </View>
   </TouchableOpacity>
 );
 
-const CustomerOrderCard = ({orders}) => {
+const CustomerOrderCard = () => {
   const navigation = useNavigation();
-  const [orders1, setOrders] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
+  const handleLogOut = async () => {
+    await removeStore(storeKeys.token);
+    await removeStore(storeKeys.userId);
+    await removeStore(storeKeys.first_name);
+    await removeStore(storeKeys.last_name);
+    await removeStore(storeKeys.phone_number);
+
+    navigation.navigate('login');
+  };
   useEffect(() => {
     (async () => {
       try {
+        setIsLoading(true);
         const res = await getNewOrdersRequest();
-        console.log(res);
+        console.log('getNewOrdersRequest', res.status);
         if (res.status === 200) {
           setOrders(res.data.data);
+          setIsLoading(false);
+        }
+        setIsLoading(false);
+        if (res.status === 401) {
+          await handleLogOut();
         }
       } catch (error) {
-        console.log(error);
+        console.log('getNewOrdersRequest====>', error);
+        setIsLoading(false);
       }
     })();
   }, []);
 
-  console.log('Orders', orders1);
   const renderItem = ({item}) => (
     <OrderItem
       order={item}
@@ -122,24 +169,27 @@ const CustomerOrderCard = ({orders}) => {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}>
-            <ArrowLeft stroke="#FFFFFF" width={24} height={24} />
-          </TouchableOpacity>
-          <Text style={styles.title}>My Orders</Text>
+    <>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}>
+              <ArrowLeft stroke="#FFFFFF" width={24} height={24} />
+            </TouchableOpacity>
+            <Text style={styles.title}>My Orders</Text>
+          </View>
+          <FlatList
+            data={orders}
+            renderItem={renderItem}
+            keyExtractor={item => item.order_number}
+            contentContainerStyle={styles.listContent}
+          />
         </View>
-        <FlatList
-          data={orders1}
-          renderItem={renderItem}
-          keyExtractor={item => item.order_number}
-          contentContainerStyle={styles.listContent}
-        />
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+      {isLoading && <Loading />}
+    </>
   );
 };
 
@@ -152,7 +202,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    backgroundColor: '#D49D84',
+    backgroundColor: '#ffa022',
     paddingVertical: 10,
     paddingHorizontal: 16,
     flexDirection: 'row',
@@ -262,7 +312,7 @@ const styles = StyleSheet.create({
   viewDetailsText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#D49D84',
+    color: '#ffa022',
     marginRight: 8,
   },
 });

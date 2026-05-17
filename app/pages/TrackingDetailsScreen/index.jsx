@@ -85,7 +85,7 @@ const StatusItem = ({
             {photoUrl && (
               <Icon
                 onPress={() => onPress(photoUrl)}
-                name={icon}
+                name="image"
                 size={16}
                 color={isActive ? '#10B981' : '#9CA3AF'}
               />
@@ -93,7 +93,7 @@ const StatusItem = ({
             {signatureUrl && (
               <Icon
                 onPress={() => onPress(signatureUrl)}
-                name={icon}
+                name="image"
                 size={16}
                 color={isActive ? '#10B981' : '#9CA3AF'}
               />
@@ -128,7 +128,7 @@ export default function TrackingDetailsScreen({navigation, route}) {
         console.log(response.data.data);
         if (response.status === 200) {
           console.log(
-            'https://devapi.getmyrx.ca/v2/delivery/track/',
+            'https://uatapi.getmyrx.ca/v2/delivery/track/',
             response.data.data,
           );
           setData(response.data.data);
@@ -160,7 +160,7 @@ export default function TrackingDetailsScreen({navigation, route}) {
                 alignItems: 'center',
               }}>
               <TouchableOpacity onPress={() => navigation.goBack()}>
-                <FAIcon name="arrow-left" size={24} color="#D49D84" />
+                <FAIcon name="arrow-left" size={24} color="#ffa022" />
               </TouchableOpacity>
               <Text style={styles.headerTitle}>Track Order</Text>
             </View>
@@ -171,7 +171,7 @@ export default function TrackingDetailsScreen({navigation, route}) {
               <Text style={styles.orderId}>
                 Order ID: {data && data.length > 0 && data[0].ddelivery_id}
               </Text>
-              <FAIcon name={'truck-medical'} size={16} color="#D49D84" />
+              <FAIcon name={'truck-medical'} size={16} color="#ffa022" />
 
               {/* <Text style={styles.orderAmount}>Amt: $345.00</Text> */}
             </View>
@@ -194,39 +194,46 @@ export default function TrackingDetailsScreen({navigation, route}) {
                 isActive={true}
               />
             )} */}
-            {data.map((item, index) => (
-              <>
-                <StatusItem
-                  key={index}
-                  icon={
-                    item.delivery_status_description ===
-                      'INITIATED - Assigned' ||
-                    item.delivery_status_description === 'New Driver - Assigned'
-                      ? 'user'
-                      : item.delivery_status_description ===
-                        'Picked up from the Pharmacy'
-                      ? 'shopping-cart'
-                      : 'check-circle'
-                  }
-                  title={item.delivery_status_description}
-                  photoUrl={item?.photo_url}
-                  signatureUrl={item?.signature_url}
-                  description={formatDate(item.created)}
-                  time={formatTime(item.created)}
-                  isActive={true}
-                  onPress={handleStatusPress}
-                />
-                {index !== data.length - 1 && (
-                  <View style={[styles.threeDotsIcon]}>
-                    <FAIcon
-                      name={'ellipsis-vertical'}
-                      size={20}
-                      color="#D49D84"
-                    />
-                  </View>
-                )}
-              </>
-            ))}
+            {data && data.length > 0 ? (
+              data.map((item, index) => (
+                <>
+                  <StatusItem
+                    key={index}
+                    icon={
+                      item.delivery_status_description ===
+                        'INITIATED - Assigned' ||
+                      item.delivery_status_description ===
+                        'New Driver - Assigned'
+                        ? 'user'
+                        : item.delivery_status_description ===
+                          'Picked up from the Pharmacy'
+                        ? 'shopping-cart'
+                        : 'check-circle'
+                    }
+                    title={item.delivery_status_description}
+                    photoUrl={item?.photo_url}
+                    signatureUrl={item?.signature_url}
+                    description={formatDate(item.created)}
+                    time={formatTime(item.created)}
+                    isActive={true}
+                    onPress={handleStatusPress}
+                  />
+                  {index !== data.length - 1 && (
+                    <View style={[styles.threeDotsIcon]}>
+                      <FAIcon
+                        name={'ellipsis-vertical'}
+                        size={20}
+                        color="#ffa022"
+                      />
+                    </View>
+                  )}
+                </>
+              ))
+            ) : (
+              <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                <Text>No data available </Text>
+              </View>
+            )}
             {/* <StatusItem
             icon="credit-card"
             title="Payment Confirmed"
@@ -243,24 +250,28 @@ export default function TrackingDetailsScreen({navigation, route}) {
           /> */}
           </View>
 
-          <View style={styles.deliveryAddress}>
-            <Icon
-              name="home"
-              size={20}
-              color="#4B5563"
-              style={styles.addressIcon}
-            />
-            <View>
-              <Text style={styles.addressTitle}>Delivery Address</Text>
-              <Text style={styles.addressText}>Home, Work & Other address</Text>
-              <Text style={styles.addressText}>
-                House No: 1234, Duff Floor, Sector 12,
-              </Text>
-              <Text style={styles.addressText}>
-                Gurgaon, Haryana 122002, India, Near to LIC
-              </Text>
+          {data && data.length > 0 && (
+            <View style={styles.deliveryAddress}>
+              <Icon
+                name="home"
+                size={20}
+                color="#4B5563"
+                style={styles.addressIcon}
+              />
+              <View>
+                <Text style={styles.addressTitle}>Delivery Address</Text>
+                <Text style={styles.addressText}>
+                  Home, Work & Other address
+                </Text>
+                <Text style={styles.addressText}>
+                  House No: 1234, Duff Floor, Sector 12,
+                </Text>
+                <Text style={styles.addressText}>
+                  Gurgaon, Haryana 122002, India, Near to LIC
+                </Text>
+              </View>
             </View>
-          </View>
+          )}
         </ScrollView>
         <Modal
           animationType="fade"

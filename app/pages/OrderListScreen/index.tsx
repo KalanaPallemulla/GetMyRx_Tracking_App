@@ -106,8 +106,9 @@ const TabBar: React.FC<{
   return (
     <View style={styles.tabBar}>
       {[
+        {id: 1, name: 'Ongoing'},
+        {id: 0, name: 'Pending'},
         {id: 2, name: 'Completed'},
-        {id: 0, name: 'Ongoing'},
         {id: 5, name: 'Unable'},
       ].map(tab => (
         <TouchableOpacity
@@ -129,10 +130,11 @@ const TabBar: React.FC<{
 
 export default function OrderHistory() {
   const navigation = useNavigation();
-  const [activeTab, setActiveTab] = useState<any>({id: 0, name: 'Ongoing'});
+  const [activeTab, setActiveTab] = useState<any>({id: 1, name: 'Ongoing'});
   const [data, setData] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState<any>([]);
   const [isLoading, setIsLoading] = useState<Boolean>(false);
+  const [isFilteringLoading, setIsFilteringLoading] = useState<Boolean>(false);
   // const filteredOrders = mockOrders.filter(order => order.status === activeTab);
   useEffect(() => {
     (async () => {
@@ -142,26 +144,36 @@ export default function OrderHistory() {
 
   useEffect(() => {
     if (data.length > 0) {
-      console.log(data.filter((order: any) => order.status === activeTab.id));
+      setIsFilteringLoading(true);
       setFilteredOrders(
         data.filter((order: any) => order.status === activeTab.id),
       );
+      setTimeout(() => {
+        setIsFilteringLoading(false);
+      }, 100);
     }
   }, [data, activeTab]);
 
   async function getData() {
     try {
+      const startTime = Date.now(); // Start time
       setIsLoading(true);
-      const uesrId = await getStore(storeKeys.userId);
+      const userId = await getStore(storeKeys.userId);
 
-      const res: any = await getDeliveriesRequest(uesrId);
+      const res: any = await getDeliveriesRequest(userId);
       if (res.status === 200) {
         setData(res.data.data);
         setIsLoading(false);
       }
-      console.log('getDeliveriesRequest', res.data);
+      if (res.status === 401) {
+        await handleLogOut();
+      }
+      console.log('getDeliveriesRequest', res);
+
+      const endTime = Date.now(); // End time
+      console.log(`Execution time: ${endTime - startTime}ms`);
     } catch (error) {
-      console.log('Error');
+      console.log('Error', error);
       setIsLoading(false);
     }
   }
@@ -177,9 +189,9 @@ export default function OrderHistory() {
   };
   return (
     <>
-      <StatusBar barStyle="light-content" backgroundColor="#D49D84" />
+      <StatusBar barStyle="light-content" backgroundColor="#ffa022" />
 
-      <SafeAreaView style={{flex: 0, backgroundColor: '#D49D84'}} />
+      <SafeAreaView style={{flex: 0, backgroundColor: '#ffa022'}} />
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>Orders</Text>
@@ -202,20 +214,30 @@ export default function OrderHistory() {
           </View>
         </View>
         <TabBar activeTab={activeTab.id} setActiveTab={setActiveTab} />
-        {isLoading ? (
+        {isLoading || isFilteringLoading ? (
           <View style={{flex: 1}}>
             <Loading />
           </View>
         ) : (
-          <FlatList
-            data={filteredOrders}
-            renderItem={({item}) => <OrderCard order={item} />}
-            keyExtractor={item => item.id}
-            contentContainerStyle={styles.orderList}
-            refreshControl={
-              <RefreshControl refreshing={false} onRefresh={getData} />
-            }
-          />
+          <View style={styles.container}>
+            {filteredOrders.length === 0 ? (
+              <View style={styles.emptyMessageContainer}>
+                <Text style={styles.emptyMessage}>
+                  No {activeTab.name} orders available.
+                </Text>
+              </View>
+            ) : (
+              <FlatList
+                data={filteredOrders}
+                renderItem={({item}) => <OrderCard order={item} />}
+                keyExtractor={item => item.id}
+                contentContainerStyle={styles.orderList}
+                refreshControl={
+                  <RefreshControl refreshing={false} onRefresh={getData} />
+                }
+              />
+            )}
+          </View>
         )}
       </SafeAreaView>
     </>
@@ -232,7 +254,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    backgroundColor: '#D49D84',
+    backgroundColor: '#ffa022',
   },
   title: {
     fontSize: 24,
@@ -241,7 +263,7 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: '#D49D84',
+    backgroundColor: '#ffa022',
     paddingHorizontal: 20,
     paddingVertical: 10,
   },
@@ -269,5 +291,14 @@ const styles = StyleSheet.create({
   headerIcons: {
     flexDirection: 'row',
     gap: 20,
+  },
+  emptyMessageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyMessage: {
+    fontSize: 16,
+    color: '#888',
   },
 });

@@ -33,6 +33,7 @@ import {addNewOrderRequest, getAwsCredentialsRequest} from '../../api/apiCalls';
 import awsConfigureAndUpload from '../../utils/awsHandler';
 import {Image} from 'react-native-compressor';
 import Loading from '../../components/Loading';
+import {showAlert} from '../../utils/common';
 const {width} = Dimensions.get('window');
 
 const generateUniqueId = () => {
@@ -48,6 +49,7 @@ const AmazingNewOrder = () => {
   });
   const [isDateModelOpen, setIsDateModelOpen] = useState(false);
   const [deliveryDate, setDeliveryDate] = useState(new Date());
+  const [date, setDate] = useState(new Date());
   const [images, setImages] = useState([
     {image: null, isLoading: false},
     {image: null, isLoading: false},
@@ -183,10 +185,28 @@ const AmazingNewOrder = () => {
     setImagesLocations(newImagesLocations);
   };
 
-  const onConfirmDate = params => {
-    setIsDateModelOpen(false);
-    setDeliveryDate(params.date);
-  };
+  const onConfirmSingle = React.useCallback(
+    params => {
+      setDate(params.date);
+      const selectedDate = params.date; // The date received from the picker
+      const updatedDate = new Date(selectedDate); // Clone the date to avoid mutating
+      updatedDate.setDate(updatedDate.getDate() + 1); // Add one day
+      setIsDateModelOpen(false);
+      setDeliveryDate(updatedDate); // Set the updated date
+    },
+    [setIsDateModelOpen, setDeliveryDate, setDate],
+  );
+
+  // const onConfirmDate = (params) => {
+  //   const selectedDate = params.date; // Assuming `params.date` is the confirmed date
+  //   const normalizedDate = new Date(
+  //     selectedDate.getFullYear(),
+  //     selectedDate.getMonth(),
+  //     selectedDate.getDate()
+  //   ); // Strip time zone offsets
+  //   setDeliveryDate(normalizedDate); // Update state with normalized date
+  //   setIsDateModelOpen(false);
+  // };
 
   const handleSumbitOrder = async () => {
     try {
@@ -205,8 +225,11 @@ const AmazingNewOrder = () => {
       const res = await addNewOrderRequest(data);
       console.log(res);
       if (res.status === 200) {
+        Alert.alert('Order submitted successfully');
+        // showAlert({message: 'Please check your phone number'});
         setNotes('');
         setDeliveryDate(new Date());
+        setDate(new Date());
         setImages([
           {image: null, isLoading: false},
           {image: null, isLoading: false},
@@ -238,7 +261,7 @@ const AmazingNewOrder = () => {
             <Text style={styles.sectionTitle}>Customer Information</Text>
             <View style={styles.infoRow}>
               <View style={styles.iconContainer}>
-                <User stroke="#D49D84" width={16} height={16} />
+                <User stroke="#ffa022" width={16} height={16} />
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Name</Text>
@@ -249,7 +272,7 @@ const AmazingNewOrder = () => {
             </View>
             <View style={styles.infoRow}>
               <View style={styles.iconContainer}>
-                <MapPin stroke="#D49D84" width={16} height={16} />
+                <MapPin stroke="#ffa022" width={16} height={16} />
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Address</Text>
@@ -260,7 +283,7 @@ const AmazingNewOrder = () => {
             </View>
             <View style={styles.infoRow}>
               <View style={styles.iconContainer}>
-                <Phone stroke="#D49D84" width={16} height={16} />
+                <Phone stroke="#ffa022" width={16} height={16} />
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Phone</Text>
@@ -276,7 +299,7 @@ const AmazingNewOrder = () => {
               style={styles.selectDateButton}>
               <Calendar stroke="#FFFFFF" width={20} height={20} />
               <Text style={styles.selectDateText}>
-                {deliveryDate.toLocaleDateString('en-US', {
+                {date.toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'short',
                   day: 'numeric',
@@ -287,8 +310,8 @@ const AmazingNewOrder = () => {
               locale="en"
               mode="single"
               visible={isDateModelOpen}
-              date={deliveryDate}
-              onConfirm={onConfirmDate}
+              date={date}
+              onConfirm={onConfirmSingle}
               onDismiss={() => setIsDateModelOpen(false)}
             />
           </View>
@@ -350,8 +373,21 @@ const AmazingNewOrder = () => {
           </View>
 
           <TouchableOpacity
-            style={styles.submitButton}
-            onPress={handleSumbitOrder}>
+            style={[
+              styles.submitButton,
+              {
+                backgroundColor:
+                  images.filter(image => image.image !== null).length === 0 ||
+                  images.filter(image => image.isLoading === true).length > 0
+                    ? 'gray'
+                    : '#ffa022',
+              },
+            ]}
+            onPress={handleSumbitOrder}
+            disabled={
+              images.filter(image => image.image !== null).length === 0 ||
+              images.filter(image => image.isLoading === true).length > 0
+            }>
             <Check stroke="#FFFFFF" width={20} height={20} />
             <Text style={styles.submitButtonText}>Submit Order</Text>
           </TouchableOpacity>
@@ -371,7 +407,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    backgroundColor: '#D49D84',
+    backgroundColor: '#ffa022',
     paddingVertical: 12,
     paddingHorizontal: 10,
     flexDirection: 'row',
@@ -436,7 +472,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 10,
     borderRadius: 8,
-    backgroundColor: '#D49D84',
+    backgroundColor: '#ffa022',
   },
   selectDateText: {
     color: '#FFFFFF',
@@ -485,7 +521,7 @@ const styles = StyleSheet.create({
   },
   notesInput: {
     borderWidth: 1,
-    borderColor: '#D49D84',
+    borderColor: '#ffa022',
     borderRadius: 8,
     padding: 8,
     minHeight: 80,
@@ -499,7 +535,6 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     margin: 10,
-    backgroundColor: '#D49D84',
   },
   submitButtonText: {
     color: '#FFFFFF',

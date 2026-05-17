@@ -65,7 +65,7 @@ const CustomerOrderDetails = ({route}) => {
               </View>
             </View>
             <View style={styles.iconContainer}>
-              <Package stroke="#D49D84" width={24} height={24} />
+              <Package stroke="#ffa022" width={24} height={24} />
             </View>
           </View>
 
@@ -73,22 +73,22 @@ const CustomerOrderDetails = ({route}) => {
             <Text style={styles.sectionTitle}>Order Information</Text>
             <View style={styles.whiteBackground}>
               {renderDetailRow(
-                <Calendar stroke="#D49D84" width={20} height={20} />,
+                <Calendar stroke="#ffa022" width={20} height={20} />,
                 'Created',
                 order.created,
               )}
               {renderDetailRow(
-                <Clock stroke="#D49D84" width={20} height={20} />,
+                <Clock stroke="#ffa022" width={20} height={20} />,
                 'Deliver on',
                 order.deliver_on,
               )}
               {renderDetailRow(
-                <MapPin stroke="#D49D84" width={20} height={20} />,
+                <MapPin stroke="#ffa022" width={20} height={20} />,
                 'Delivery Address',
                 order.address,
               )}
               {renderDetailRow(
-                <Home stroke="#D49D84" width={20} height={20} />,
+                <Home stroke="#ffa022" width={20} height={20} />,
                 'Pharmacy',
                 order.pharmacy_name,
               )}
@@ -99,12 +99,12 @@ const CustomerOrderDetails = ({route}) => {
             <Text style={styles.sectionTitle}>Customer Information</Text>
             <View style={styles.whiteBackground}>
               {renderDetailRow(
-                <User stroke="#D49D84" width={20} height={20} />,
+                <User stroke="#ffa022" width={20} height={20} />,
                 'Name',
                 order.consumer,
               )}
               {renderDetailRow(
-                <Phone stroke="#D49D84" width={20} height={20} />,
+                <Phone stroke="#ffa022" width={20} height={20} />,
                 'Phone',
                 order.mobile_number,
               )}
@@ -114,7 +114,7 @@ const CustomerOrderDetails = ({route}) => {
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>Additional Notes</Text>
             <View style={[styles.whiteBackground, styles.notesContainer]}>
-              <FileText stroke="#D49D84" width={20} height={20} />
+              <FileText stroke="#ffa022" width={20} height={20} />
               <Text style={styles.notesText}>
                 {order.notes || 'No additional notes'}
               </Text>
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    backgroundColor: '#D49D84',
+    backgroundColor: '#ffa022',
     paddingVertical: 10,
     paddingHorizontal: 16,
     flexDirection: 'row',

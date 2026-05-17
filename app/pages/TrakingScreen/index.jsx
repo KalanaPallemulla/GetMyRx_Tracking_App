@@ -21,16 +21,18 @@ export default function TrackingInputScreen() {
   const handleSubmit = () => {
     console.log('Submitted tracking number:', trackingNumber);
     // Add your tracking logic here
-    navigation.navigate('trakingDetails', trackingNumber);
-    setTrackingNumber('');
+    if (trackingNumber.length > 0) {
+      navigation.navigate('trakingDetails', trackingNumber);
+      setTrackingNumber('');
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#D49D84" />
+      <StatusBar barStyle="light-content" backgroundColor="#ffa022" />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <FAIcon name="arrow-left" size={24} color="#D49D84" />
+          <FAIcon name="arrow-left" size={24} color="#ffa022" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Cargo Optix</Text>
         <TouchableOpacity accessibilityLabel="Menu">
@@ -62,11 +64,19 @@ export default function TrackingInputScreen() {
             onChangeText={setTrackingNumber}
             placeholderTextColor="#A0AEC0"
             accessibilityLabel="Enter tracking number"
+            keyboardType="numeric"
           />
           <TouchableOpacity
-            style={styles.submitButton}
+            style={[
+              styles.submitButton,
+              {
+                backgroundColor:
+                  trackingNumber.length === 0 ? 'gray' : '#ffa022',
+              },
+            ]}
             onPress={handleSubmit}
-            accessibilityLabel="Submit tracking number">
+            accessibilityLabel="Submit tracking number"
+            disabled={trackingNumber.length === 0}>
             <Icon name="arrow-right" size={24} color="#FFF" />
           </TouchableOpacity>
         </View>
@@ -89,7 +99,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#D49D84',
+    color: '#ffa022',
   },
   gradientBackground: {
     height: 300,
@@ -162,7 +172,6 @@ const styles = StyleSheet.create({
   submitButton: {
     width: 50,
     height: 50,
-    backgroundColor: '#D49D84',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',

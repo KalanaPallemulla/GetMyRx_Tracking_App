@@ -1,6 +1,7 @@
 import {showMessage} from 'react-native-flash-message';
 
 export function showAlert({message = '', type = 'success'}) {
+  console.log('showAlert', message);
   showMessage({
     message: message,
     type: type,
